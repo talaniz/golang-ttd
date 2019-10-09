@@ -63,6 +63,7 @@ func (d Dictionary) Update(word, definition string) error {
 	return nil
 }
 
+// Delete removes a word from a dictionary
 func (d Dictionary) Delete(word string) {
 	delete(d, word)
 }
