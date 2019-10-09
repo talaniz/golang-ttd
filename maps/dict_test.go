@@ -40,31 +40,63 @@ func TestAdd(t *testing.T) {
 
 		err := dictionary.Add(word, definition)
 
-		if err != nil {
-			t.Fatal("did not expect an error, but one was generated")
-		}
-
+		assertError(t, err, nil)
 		assertDefinition(t, dictionary, word, definition)
 	})
 
 	t.Run("existing word", func(t *testing.T) {
-		dictionary := Dictionary{}
 		word := "test"
 		definition := "this is just a test"
+		dictionary := Dictionary{}
 
 		err := dictionary.Add(word, definition)
 
-		if err != nil {
-			t.Fatal("did not expect an error, but one was generated")
-		}
+		assertError(t, err, nil)
+		assertDefinition(t, dictionary, word, definition)
 
 		assertDefinition(t, dictionary, word, definition)
 
-		err = dictionary.Add(word, definition)
+		err = dictionary.Add(word, "new test")
 
-		assertError(t, err, ErrAlreadyExists)
+		assertError(t, err, ErrWordExists)
 
 	})
+}
+
+func TestUpdate(t *testing.T) {
+
+	t.Run("existing word", func(t *testing.T) {
+		word := "test"
+		definition := "this is just a test"
+		dictionary := Dictionary{word: definition}
+		newDefinition := "new definition"
+
+		dictionary.Update(word, newDefinition)
+
+		assertDefinition(t, dictionary, word, newDefinition)
+	})
+
+	t.Run("new word", func(t *testing.T) {
+		word := "test"
+		definition := "this is just a test"
+		dictionary := Dictionary{}
+
+		err := dictionary.Update(word, definition)
+
+		assertError(t, err, ErrWordDoesNotExist)
+	})
+}
+
+func TestDelete(t *testing.T) {
+	word := "test"
+	dictionary := Dictionary{word: "this is just a test"}
+
+	dictionary.Delete(word)
+
+	_, err := dictionary.Search(word)
+	if err != ErrNotFound {
+		t.Errorf("Expected %q to be deleted", word)
+	}
 }
 
 func assertDefinition(t *testing.T, dictionary Dictionary, word, definition string) {
