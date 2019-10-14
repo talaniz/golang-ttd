@@ -13,6 +13,7 @@ func Racer(a, b string) (winner string, err error) {
 	return ConfigurableRacer(a, b, tenSecondTimeout)
 }
 
+// ConfigurableRacer returns the faster of two URLs or times out after timeout
 func ConfigurableRacer(a, b string, timeout time.Duration) (winner string, err error) {
 	select {
 	case <-ping(a):
@@ -31,10 +32,4 @@ func ping(url string) chan bool {
 		ch <- true
 	}()
 	return ch
-}
-
-func measureResponseTime(url string) time.Duration {
-	start := time.Now()
-	http.Get(url)
-	return time.Since(start)
 }
